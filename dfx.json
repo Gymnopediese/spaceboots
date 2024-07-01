@@ -1,0 +1,17 @@
+{
+    "canisters": {
+        "spaceboots_board": {
+            "main": "src/spaceboots/board/main.mo",
+            "type": "motoko"
+        },
+        "spaceboots_boot": {
+            "main": "src/spaceboots/boot/main.mo",
+            "type": "motoko"
+        }
+    },
+    "defaults": {
+        "build": {
+            "packtool": "mops sources"
+        }
+    }
+}

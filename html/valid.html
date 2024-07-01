@@ -1,0 +1,36 @@
+<html>
+<head>
+    <title>Valid</title>
+</head>
+<body>
+
+    <h1>
+        Well done bro, seems like real shoes !!!
+    </h1>
+
+    <script>
+
+        fetch(document.URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        }).then(response => {
+        if (!response.ok) {
+            console.log(response);
+        }
+        return response.json();
+            }).then(data => {
+            console.log(data);
+            }).catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+            
+    </script>
+    <script>
+
+
+       
+    </script>
+</body>
+</html>
