@@ -54,23 +54,28 @@ module {
   };
 
     public func scan(url : Text, scan_count : Nat) : Nat {
+        Debug.print("1");
+
         let full_query = Iter.toArray(Text.split(url, #char '?'));
         if (full_query.size() != 2) {
             return 0;
         };
+         Debug.print("1");
 
         let queries = Iter.toArray(Text.split(full_query[1], #char '&'));
 
-        if (queries.size() != 2) {
+        if (queries.size() != 3) {
             return 0;
         };
+         Debug.print("1");
 
-        let cmac_query = Iter.toArray(Text.split(queries[1], #char '='));
-        let counter_query = Iter.toArray(Text.split(queries[0], #char '='));
+        let cmac_query = Iter.toArray(Text.split(queries[2], #char '='));
+        let counter_query = Iter.toArray(Text.split(queries[1], #char '='));
 
         if (cmac_query.size() != 2 or counter_query.size() != 2 or cmac_query[0] != "cmac" or counter_query[0] != "ctr") {
             return 0;
         };
+         Debug.print("1");
 
         var counter = hexToNat(counter_query[1]);
 
@@ -79,9 +84,12 @@ module {
 
         let sha = Sha.sha256(Array.map(Text.toArray(cmac_query[1]), func (c : Char) : Nat8 { Nat8.fromNat(Nat32.toNat(Char.toNat32(c)))}));
     
+
+
         if (counter >= cmacs.size() or counter <= scan_count) {
             return 0;
         };
+         Debug.print("1");
     
         var res = counter;
 
@@ -90,6 +98,7 @@ module {
                 res := 0;
             };
         };
+         Debug.print(Nat.toText(res));
 
         return res;
     };

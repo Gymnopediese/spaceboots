@@ -16,25 +16,31 @@ shared ({ caller = creator }) actor class Boot() = this {
 
     var name : Text = "Boot";
 
-    public func http_request_update(request : Http.HttpRequest) : async Http.HttpResponse {
+    public func http_request_update(request : Frontend.Request) : async Frontend.Response {
         let counter = Scan.scan(request.url, scan_count);
-        if (counter > 0) {
-            scan_count := counter;
+        if (counter <= 0) {
+            return {
+                body = Text.encodeUtf8("Invalid Scan Count: " # Nat.toText(scan_count));
+                headers = [("Content-Type", "text/plain")];
+                status_code = 200;
+                streaming_strategy = null;
+                upgrade = ?false;
+            };
         };
-        return {
-            body = Text.encodeUtf8("Scan Count: " # Nat.toText(scan_count));
-            headers = [("Content-Type", "text/plain")];
-            status_code = 200;
-            streaming_strategy = null;
-            upgrade = ?true;
-        }
+        scan_count := counter;
+        let new_request = {
+            url = "/valid.html";
+            method = request.method;
+            body = request.body;
+            headers = request.headers;
+        };
+
+        return (Frontend.http_request(new_request));
     };
 
     
-    public query func http_request(request : Frontend.Request) : async Frontend.Response {
+    public query func http_request(request : Http.HttpRequest) : async Http.HttpResponse {
 
-
-        try {
         let counter = Scan.scan(request.url, scan_count);
 
         Debug.print("Valid: " # Nat.toText(counter)# " Scan Count: " # Nat.toText(scan_count));
@@ -49,13 +55,14 @@ shared ({ caller = creator }) actor class Boot() = this {
             headers = request.headers;
         };
 
-        return (Frontend.http_request(new_request));
-        } catch (err) {
-            return ({
-                body = Text.encodeUtf8("Error: " # Error.message(err));
-                headers = [("Content-Type", "text/plain")];
-                status_code = 500;
-            });
+        let res = Frontend.http_request(new_request);
+
+        return {
+            body = res.body;
+            headers = res.headers;
+            status_code = res.status_code;
+            streaming_strategy = null;
+            upgrade = if (counter > 0) { ?true } else { ?false };
         };
     };
 
